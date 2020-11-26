@@ -1,5 +1,6 @@
 import copy
-
+from random import randint
+from random import choice
 
 cases_MT = [[0, 0], [0, 7], [0, 14], [7, 0],
             [7, 14], [14, 0], [14, 7], [14, 14]]
@@ -73,3 +74,115 @@ def print_list(board_list):
         print()
     print()
     print()
+
+
+def init_dico():
+    values_list = [
+        1,
+        3,
+        3,
+        2,
+        1,
+        4,
+        2,
+        4,
+        1,
+        8,
+        10,
+        1,
+        2,
+        1,
+        1,
+        3,
+        8,
+        1,
+        1,
+        1,
+        1,
+        4,
+        10,
+        10,
+        10,
+        10
+    ]
+    numbers_list = [
+        9,
+        2,
+        2,
+        3,
+        15,
+        2,
+        2,
+        2,
+        8,
+        1,
+        1,
+        5,
+        3,
+        6,
+        6,
+        2,
+        1,
+        6,
+        6,
+        6,
+        6,
+        2,
+        1,
+        1,
+        1,
+        1
+    ]
+    letters_dictionary = {}
+    letter = 'a'
+    for i in range(26):
+        letters_dictionary[chr(
+            ord('a')+i)] = {"occ": numbers_list[i], "val": values_list[i]}
+    letters_dictionary["?"] = {"occ": 2, "val": 0}
+    return letters_dictionary
+
+
+def init_pioche(dico):
+    pioche_list = []
+    for keys in dico:
+        number_of_repetition = dico[keys]["occ"]
+        for n in range(number_of_repetition):
+            pioche_list.append(keys)
+
+    return pioche_list
+
+
+def piocher(number, sac):
+    hand_drawn = []
+    for i in range(number):
+        new_letter = choice(sac)
+        hand_drawn.append(new_letter)
+        sac.remove(new_letter)
+    return hand_drawn
+
+
+def completer_main(current_hand, sac):
+    # global our_hand
+    hand_length = len(current_hand)
+    additions_number = 7-hand_length
+    if len(sac) < additions_number:
+        additions = piocher(len(sac), sac)
+    else:
+        additions = piocher(additions_number, sac)
+    current_hand = current_hand + additions
+    return current_hand
+
+
+def echanger(jetons, my_hand, sac):
+    hand_length = len(jetons)
+    additions = []
+    did_exchange = False
+    if(len(sac) >= 7):
+        additions = piocher(hand_length, sac)
+        for jeton in jetons:
+            my_hand.remove(jeton)
+        sac = sac + jetons
+        did_exchange = True
+
+    my_hand = my_hand + additions
+    return [my_hand, sac, did_exchange]
