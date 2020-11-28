@@ -186,3 +186,46 @@ def echanger(jetons, my_hand, sac):
 
     my_hand = my_hand + additions
     return [my_hand, sac, did_exchange]
+
+
+def generer_dico(file):
+    with open(file, 'r') as our_file:
+        data = our_file.readlines()
+        lower_case_words = [x.lower()[:-1]
+                            for x in data]
+    return lower_case_words
+
+
+def mot_jouable(our_word, list_of_available_letters):
+    jouable = True
+    letters_copy = copy.copy(list_of_available_letters)
+    for letter in our_word:
+        if letter not in letters_copy:
+            if '?' in letters_copy:
+                letters_copy.remove("?")
+            else:
+                jouable = False
+        else:
+            letters_copy.remove(letter)
+
+    return jouable
+
+
+def mots_jouables(words_list, list_of_available_letters, extras):  # extras is a number
+    list_of_available_letters_copy = copy.copy(list_of_available_letters)
+    list_of_available_letters_copy += ['?'] * extras
+
+    mots_jouables = []
+    for word in words_list:
+        if mot_jouable(word, list_of_available_letters_copy):
+            mots_jouables.append(word)
+    # print(mots_jouables)
+    return mots_jouables
+
+
+# what are we doing idk im thinking,
+# what i'm thinking is that we do the first situation, where we enter the number, and then stop fro now
+# meanwhile, we'll write to the prof and ask which situation it is
+
+# to do the first situation, i will simply add '?' to the list_of_available_letters, and then test
+# cool?, or do you have another idea, or another way to do lets try urs
