@@ -25,24 +25,14 @@ exchanged_hand, letters_list, did_exchange = echanger(
 all_possible_words = generer_dico('documents/littre.txt')
 word_with_u = [word for word in all_possible_words if word[0] == "u"]
 
-# just to save names, cuz we have a loot
-# mots_jouables_arg_1 = ["COURIR", "PIED", "DEPIT", "TAPIR", "MARCHER"]
-# mots_jouables_arg_2 = ["P", "I", "D", "E"]
+# mots_jouables_arg_1 = ["COURIR", "PIED", "DEPIT", "DEPTI", "TAPIR", "MARCHER"]
+# mots_jouables_arg_2 = ["P", "I", "D", "E", "T", "A", "R"]
 # mots_jouables(mots_jouables_arg_1, mots_jouables_arg_2, extras=0)
 
-# # ------- TEST CASE -------- #
-# # Amelioration: les mots peuvent etre places en exploitant les jetons deja poses sur le plateau. Completer ces fonctions
-# # pour generer des listes de mots jouables avec les lettres de la main plus une lettre manquante, ou plus plusieurs
-# # lettres manquantes(on pourra passer ce nombre en parametre).
+# value = valeur_mot('ronaldd', letters_dico)
 
+# meilleur_mott = meilleur_mot(
+#     mots_jouables_arg_1, mots_jouables_arg_2, letters_dico)
 
-# ['abc', 'cab', 'abcd', 'bacd', 'abcdef']
-# ['a', 'b', 'c']
-# with all the letters, it returns
-# ['abc', 'cab']
-
-# with 1 letter missing it returns or with ['d'] as the argument
-# ['abc', 'cab'] + ['abcd', 'bacd']
-
-# with 2 letters missing it returns or with ['d', 'e'] as the argument
-# ['abc', 'cab'] + ['abcd', 'bacd'] + ['abcedf']
+# meilleurs_motts = meilleurs_mots(
+#     mots_jouables_arg_1, mots_jouables_arg_2, letters_dico)

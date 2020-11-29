@@ -158,6 +158,9 @@ def mot_jouable(our_word, list_of_available_letters):
 
     return jouable
 
+# i think it has to do with the list, we modify it, even though we have made a copy
+# i'm not sure but this is what i think happened
+
 
 def mots_jouables(words_list, list_of_available_letters, extras):  # extras is a number
     list_of_available_letters_copy = copy.copy(list_of_available_letters)
@@ -171,9 +174,47 @@ def mots_jouables(words_list, list_of_available_letters, extras):  # extras is a
     return mots_jouables
 
 
-# what are we doing idk im thinking,
-# what i'm thinking is that we do the first situation, where we enter the number, and then stop fro now
-# meanwhile, we'll write to the prof and ask which situation it is
+def valeur_mot(mot, dico):
+    total = 0
+    for letter in mot:
+        total = total + dico[letter.lower()]['val']  # is this ok
+    if len(mot) == 7:
+        total += 50
 
-# to do the first situation, i will simply add '?' to the list_of_available_letters, and then test
-# cool?, or do you have another idea, or another way to do lets try urs
+    return total
+
+
+def meilleur_mot(list_of_words, list_of_letters, dico):
+    playable_words = mots_jouables(list_of_words, list_of_letters, extras=0)
+    if len(playable_words) == 0:
+        return ""
+    else:
+        max_value = -1
+        max_value_word = ""
+        for word in playable_words:
+            current_value = valeur_mot(word, dico)
+            if current_value > max_value:
+                max_value = current_value
+                max_value_word = word
+
+        return max_value_word
+
+
+def meilleurs_mots(list_of_words, list_of_letters, dico):
+    playable_words = mots_jouables(list_of_words, list_of_letters, extras=0)
+    if len(playable_words) == 0:
+        return ""
+    else:
+        max_value = -1
+        max_word = ""
+        max_value_words = []
+        for word in playable_words:
+            current_value = valeur_mot(word, dico)
+            if current_value > max_value:
+                max_value = current_value
+                max_word = word
+        for word in playable_words:
+            if valeur_mot(word, dico) == max_value:
+                max_value_words.append(word)
+
+        return max_value_words

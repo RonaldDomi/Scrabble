@@ -13,7 +13,7 @@ you want to have the new code
 publish it for your team to get it
 --- open console
 -- git add *
--- git commit -m "description of the functionality""
+-- git commit -m "description of the functionality"
 -- git push
 
 3rd scenario => both you and your team wrote some code, and 
