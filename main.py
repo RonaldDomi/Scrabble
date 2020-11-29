@@ -36,3 +36,12 @@ word_with_u = [word for word in all_possible_words if word[0] == "u"]
 
 # meilleurs_motts = meilleurs_mots(
 #     mots_jouables_arg_1, mots_jouables_arg_2, letters_dico)
+
+# coords_list = lire_coords(new_jetons_board)
+
+tester_placement(new_jetons_board, 1, 1, "vertical", "roni")
+
+hand_letters = list("farah")
+mot = 'farah'
+direction = 'vertical'
+placer_mot(new_jetons_board, hand_letters, mot, 2, 3, direction)

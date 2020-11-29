@@ -218,3 +218,90 @@ def meilleurs_mots(list_of_words, list_of_letters, dico):
                 max_value_words.append(word)
 
         return max_value_words
+
+
+def lire_coords(new_jetons_board):
+    coordinate = input("Enter coordinates : ")
+    is_bad_format = True
+    list_of_coordinates = coordinate.split(' ')
+    while is_bad_format:
+        row = int(list_of_coordinates[0]) - 1
+        column = int(list_of_coordinates[1]) - 1
+
+        if row < 0 or row > 14 or column < 0 or column > 14:
+            print('invalid coordinates')
+            coordinate = input("Enter coordinates : ")
+            list_of_coordinates = coordinate.split(' ')
+
+        elif new_jetons_board[row][column][0] == ' ':
+            is_bad_format = False
+        else:
+            print("that place is already filled")
+            coordinate = input("Enter coordinates : ")
+            list_of_coordinates = coordinate.split(' ')
+    return list_of_coordinates
+
+
+def tester_placement(jetons_board, row, column, direction, mot):
+
+    list_of_letters = []
+
+    if direction == "horizontal":
+        if column + len(mot) > 15:
+            print('outside boundaries')
+            return []
+        for cellIndex in range(column-1, column-1 + len(mot)):
+            if jetons_board[row-1][cellIndex][0] != 'j':
+                list_of_letters.append(mot[cellIndex - column+1])
+            else:
+                pass
+
+    elif direction == "vertical":
+        if row + len(mot) > 15:
+            print('outside boundaries')
+            return []
+        for cellIndex in range(row-1, row-1 + len(mot)):
+            if jetons_board[cellIndex][column-1][0] != 'j':
+                list_of_letters.append(mot[cellIndex - row+1])
+            else:
+                pass
+
+    return list_of_letters
+
+# Ecrire une fonction placer mot(plateau,lm,mot,i,j,dir) qui recoit le plateau, la liste des lettres en main, un
+# mot, les coordonnees de depart et la direction ; qui teste les contraintes (on utilisera tester placement, mais cela
+# ne sut pas); qui place le mot a cet endroit du plateau (modie donc le plateau), en utilisant les lettres de la main
+# (modie donc la main). Attention a ne pas consommer les lettres de la main tant qu'on n'est pas s^ur de pouvoir
+# placer le mot. Cette fonction renvoie un booleen pour indiquer le succes ou l'echec du placement. En cas d'echec,
+# ni la main ni le plateau ne doivent ^etre modies.
+
+
+def placer_mot(board, hand_letters, mot, row, column, direction):
+    list_of_needed_letters = tester_placement(
+        board, row, column, direction, mot)
+    fail_of_placement = True
+    if list_of_needed_letters != []:
+        fail_of_placement = False
+        # for element in list_of_needed_letters:
+        #     hand_letters.remove(element)
+        if direction == "horizontal":
+            j = 0
+            for i in range(len(mot)):
+
+                # if board[row][column+i][0] == ' ':
+
+                board[row][column+i] = mot[j] + '  '
+                j += 1
+        if direction == "vertical":
+            j = 0
+            for i in range(len(mot)):
+
+                # if board[row][column+i][0] == ' ':
+                board[row+i][column] = mot[j] + '  '
+                j += 1
+
+    for line in board:
+        print(line)
+        print()
+
+    # return fail_of_placement
