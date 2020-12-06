@@ -13,6 +13,9 @@ cases_LD = [[0, 3], [0, 11], [2, 6], [2, 8], [3, 0], [3, 7], [3, 14], [6, 2], [6
 
 
 def init_bonus():
+    """
+        15x15 list of lists with bonuses
+    """
     board = []
     for i in range(15):  # columns
         board.append([])
@@ -36,6 +39,9 @@ def init_bonus():
 
 
 def init_jeton():
+    """"
+        15x15 list of lists of empty cells
+    """
     empty_board = []
     for i in range(15):  # columns
         empty_board.append([])
@@ -64,7 +70,6 @@ def affiche_jetons(empty_jetons, list_jetons):
                     new_jetons_board[row_index][cell_index] = "j  "
             else:
                 cell = ""
-
     return new_jetons_board
 
 
@@ -77,6 +82,9 @@ def print_list(board_list):
 
 
 def init_dico():
+    """
+        dictionary with the values of each letter of the alphabet
+    """
     values_list = [1, 3, 3, 2, 1, 4, 2, 4, 1, 8, 10, 1,
                    2, 1, 1, 3, 8, 1, 1, 1, 1, 4, 10, 10, 10, 10]
     numbers_list = [9, 2, 2, 3, 15, 2, 2, 2, 8, 1, 1,
@@ -158,9 +166,6 @@ def mot_jouable(our_word, list_of_available_letters):
 
     return jouable
 
-# i think it has to do with the list, we modify it, even though we have made a copy
-# i'm not sure but this is what i think happened
-
 
 def mots_jouables(words_list, list_of_available_letters, extras):  # extras is a number
     list_of_available_letters_copy = copy.copy(list_of_available_letters)
@@ -176,8 +181,11 @@ def mots_jouables(words_list, list_of_available_letters, extras):  # extras is a
 
 def valeur_mot(mot, dico):
     total = 0
+    print(mot, ' has ', end='')
     for letter in mot:
-        total = total + dico[letter.lower()]['val']  # is this ok
+        print(dico[letter.lower()]['val'], " + ", end='')
+        total = total + dico[letter.lower()]['val']
+    print(' this value`')
     if len(mot) == 7:
         total += 50
 
@@ -243,65 +251,127 @@ def lire_coords(new_jetons_board):
 
 
 def tester_placement(jetons_board, row, column, direction, mot):
-
+    '''
+        returns the list of letters for the word; \n
+        else returns [] \n
+        row, column is position.
+    '''
     list_of_letters = []
-
+    rowIndex = row - 1
+    columnIndex = column - 1
     if direction == "horizontal":
-        if column + len(mot) > 15:
+        if column + len(mot) > 14:
             print('outside boundaries')
             return []
-        for cellIndex in range(column-1, column-1 + len(mot)):
-            if jetons_board[row-1][cellIndex][0] != 'j':
-                list_of_letters.append(mot[cellIndex - column+1])
-            else:
-                pass
-
+        i = 0
+        for cellIndex in range(columnIndex, columnIndex + len(mot)):
+            if jetons_board[rowIndex][cellIndex][0] != 'j':
+                list_of_letters.append(mot[i])
+            i += 1
     elif direction == "vertical":
-        if row + len(mot) > 15:
+        if row + len(mot) > 14:
             print('outside boundaries')
             return []
-        for cellIndex in range(row-1, row-1 + len(mot)):
-            if jetons_board[cellIndex][column-1][0] != 'j':
-                list_of_letters.append(mot[cellIndex - row+1])
-            else:
-                pass
-
+        i = 0
+        for cellIndex in range(rowIndex, rowIndex + len(mot)):
+            if jetons_board[cellIndex][columnIndex][0] != 'j':
+                list_of_letters.append(mot[i])
+            i += 1
     return list_of_letters
 
-# Ecrire une fonction placer mot(plateau,lm,mot,i,j,dir) qui recoit le plateau, la liste des lettres en main, un
-# mot, les coordonnees de depart et la direction ; qui teste les contraintes (on utilisera tester placement, mais cela
-# ne sut pas); qui place le mot a cet endroit du plateau (modie donc le plateau), en utilisant les lettres de la main
-# (modie donc la main). Attention a ne pas consommer les lettres de la main tant qu'on n'est pas s^ur de pouvoir
-# placer le mot. Cette fonction renvoie un booleen pour indiquer le succes ou l'echec du placement. En cas d'echec,
-# ni la main ni le plateau ne doivent ^etre modies.
 
-
-def placer_mot(board, hand_letters, mot, row, column, direction):
-    list_of_needed_letters = tester_placement(
+def placer_mot(board, hand, mot, row, column, direction):
+    """
+        updates the hand and the board, removes the letters of the word from the hand; \n
+        returns True; \n
+        if not possible, nothing False \n
+        row, column is position.
+    """
+    rowIndex = row - 1
+    columnIndex = column - 1
+    can_be_placed = tester_placement(
         board, row, column, direction, mot)
-    fail_of_placement = True
-    if list_of_needed_letters != []:
-        fail_of_placement = False
-        # for element in list_of_needed_letters:
-        #     hand_letters.remove(element)
+
+    if can_be_placed != []:
         if direction == "horizontal":
-            j = 0
             for i in range(len(mot)):
+                if board[rowIndex][columnIndex+i][0] != 'j':
+                    board[rowIndex][columnIndex+i] = mot[i] + '  '
+                    hand.remove(mot[i])
 
-                # if board[row][column+i][0] == ' ':
-
-                board[row][column+i] = mot[j] + '  '
-                j += 1
         if direction == "vertical":
-            j = 0
             for i in range(len(mot)):
+                if board[rowIndex+i][columnIndex][0] != 'j':
+                    board[rowIndex+i][columnIndex] = mot[i] + '  '
+                    hand.remove(mot[i])
 
-                # if board[row][column+i][0] == ' ':
-                board[row+i][column] = mot[j] + '  '
-                j += 1
+        return True
+    else:
+        return False
 
-    for line in board:
-        print(line)
-        print()
 
-    # return fail_of_placement
+def valeur_mot_better(direction, mot, letters_value_dico, bonuses_dico, row, column):
+    """
+        gets a bunch of arguments, and returns the value of the word\n
+        adding all the bonuses of the table\n
+        row/column are positons
+    """
+    multiplier = "1"
+    rowIndex = row - 1
+    columnIndex = column-1
+    word_value = 0
+    letterIndex = 0
+    if direction == 'horizontal':  # -_-#
+        for cell in range(columnIndex, columnIndex + len(mot)):
+            if bonuses_dico[rowIndex][cell] == "MT":
+                print("hitted a bonus, MT")
+                multiplier = "3"
+                word_value += letters_value_dico[mot[letterIndex].lower()
+                                                 ]['val']
+            elif bonuses_dico[rowIndex][cell] == "MD":
+                print("hitted a bonus, MD")
+                multiplier = "2"
+                word_value += letters_value_dico[mot[letterIndex].lower()
+                                                 ]['val']
+            elif bonuses_dico[rowIndex][cell] == "LD":
+                print("hitted a bonus, LD")
+                word_value += letters_value_dico[mot[letterIndex].lower()
+                                                 ]['val'] * 2
+            elif bonuses_dico[rowIndex][cell] == "LT":
+                print("hitted a bonus, LT")
+                word_value += letters_value_dico[mot[letterIndex].lower()
+                                                 ]['val'] * 3
+            else:
+                word_value += letters_value_dico[mot[letterIndex].lower()
+                                                 ]['val']
+
+            letterIndex += 1
+    elif direction == 'vertical':
+        for cell in range(rowIndex, rowIndex + len(mot)):
+            if bonuses_dico[cell][columnIndex] == "MT":
+                print("hitted a bonus, MT")
+                multiplier = "3"
+                word_value += letters_value_dico[mot[letterIndex].lower()
+                                                 ]['val']
+            elif bonuses_dico[cell][columnIndex] == "MD":
+                print("hitted a bonus, MD")
+                multiplier = "2"
+                word_value += letters_value_dico[mot[letterIndex].lower()
+                                                 ]['val']
+            elif bonuses_dico[cell][columnIndex] == "LD":
+                print("hitted a bonus, LD")
+                word_value += letters_value_dico[mot[letterIndex].lower()
+                                                 ]['val'] * 2
+            elif bonuses_dico[cell][columnIndex] == "LT":
+                print("hitted a bonus, LT")
+                word_value += letters_value_dico[mot[letterIndex].lower()
+                                                 ]['val'] * 3
+            else:
+                word_value += letters_value_dico[mot[letterIndex].lower()
+                                                 ]['val']
+
+            letterIndex += 1
+
+    print("total: ", word_value)
+    word_value = word_value * int(multiplier)
+    print("total after the bonus: ", word_value)
