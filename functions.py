@@ -12,7 +12,7 @@ cases_LD = [[0, 3], [0, 11], [2, 6], [2, 8], [3, 0], [3, 7], [3, 14], [6, 2], [6
     7, 11], [8, 2], [8, 6], [8, 8], [8, 12], [11, 0], [11, 7], [11, 14], [12, 6], [12, 8], [14, 3], [14, 11]]
 
 
-def init_bonus():
+def init_bonus_board():
     """
         15x15 list of lists with bonuses
     """
@@ -81,7 +81,7 @@ def print_list(board_list):
     print()
 
 
-def init_dico():
+def letters_dico():
     """
         dictionary with the values of each letter of the alphabet
     """
@@ -98,10 +98,15 @@ def init_dico():
     return letters_dictionary
 
 
-def init_pioche(dico):
+def init_sac(letters_dico):
+    """
+        list with all the letters left in the sac\n
+        return the sac with letters
+    """
     pioche_list = []
-    for keys in dico:
-        number_of_repetition = dico[keys]["occ"]
+    for keys in letters_dico:
+        number_of_repetition = letters_dico[keys]["occ"]
+        number_of_repetition = 2
         for n in range(number_of_repetition):
             pioche_list.append(keys)
 
@@ -109,6 +114,10 @@ def init_pioche(dico):
 
 
 def piocher(number, sac):
+    """
+        removes a number of letters from the sac\n
+        return the list with x letters
+    """
     hand_drawn = []
     for i in range(number):
         new_letter = choice(sac)
@@ -118,9 +127,11 @@ def piocher(number, sac):
 
 
 def completer_main(current_hand, sac):
-    # global our_hand
+    """
+        removes from the sac and returns the current_hand with 7 letters
+    """
     hand_length = len(current_hand)
-    additions_number = 7-hand_length
+    additions_number = 10-hand_length  # here
     if len(sac) < additions_number:
         additions = piocher(len(sac), sac)
     else:
@@ -130,10 +141,14 @@ def completer_main(current_hand, sac):
 
 
 def echanger(jetons, my_hand, sac):
+    """
+        exchanges selected jetons and removes them from the hand\n
+        return the [new_hand, new_sac, True/False]
+    """
     hand_length = len(jetons)
     additions = []
     did_exchange = False
-    if(len(sac) >= 7):
+    if(len(sac) >= 10):  # here
         additions = piocher(hand_length, sac)
         for jeton in jetons:
             my_hand.remove(jeton)
@@ -145,6 +160,9 @@ def echanger(jetons, my_hand, sac):
 
 
 def generer_dico(file):
+    """
+        returns the list of words in the game dictionary
+    """
     with open(file, 'r') as our_file:
         data = our_file.readlines()
         lower_case_words = [x.lower()[:-1]
@@ -181,11 +199,8 @@ def mots_jouables(words_list, list_of_available_letters, extras):  # extras is a
 
 def valeur_mot(mot, dico):
     total = 0
-    print(mot, ' has ', end='')
     for letter in mot:
-        print(dico[letter.lower()]['val'], " + ", end='')
         total = total + dico[letter.lower()]['val']
-    print(' this value`')
     if len(mot) == 7:
         total += 50
 
@@ -193,6 +208,9 @@ def valeur_mot(mot, dico):
 
 
 def meilleur_mot(list_of_words, list_of_letters, dico):
+    """
+        returns the word with the biggest value
+    """
     playable_words = mots_jouables(list_of_words, list_of_letters, extras=0)
     if len(playable_words) == 0:
         return ""
@@ -209,6 +227,9 @@ def meilleur_mot(list_of_words, list_of_letters, dico):
 
 
 def meilleurs_mots(list_of_words, list_of_letters, dico):
+    """
+        returns the word with the list with the best words
+    """
     playable_words = mots_jouables(list_of_words, list_of_letters, extras=0)
     if len(playable_words) == 0:
         return ""
@@ -228,25 +249,48 @@ def meilleurs_mots(list_of_words, list_of_letters, dico):
         return max_value_words
 
 
+def get_coords_input():
+    """
+        input row/column and input direction\n
+        return [row, column], direction
+    """
+    coordinate = input("Enter coordinates (row column): ")
+    list_of_coordinates = coordinate.split(' ')
+    list_of_coordinates[0] = int(list_of_coordinates[0])
+    list_of_coordinates[1] = int(list_of_coordinates[1])
+    direction = input("Enter direction (horizontal, vertical): ")
+    return list_of_coordinates, direction
+
+
 def lire_coords(new_jetons_board):
-    coordinate = input("Enter coordinates : ")
+    """
+        reads the coordinates in a predefined stucture  : row column direction\n
+        returns the list of [row, column, direction]
+    """
+    coordinate = input("Enter coordinates (row column): ")
+    direction = input("Enter direction (horizontal, vertical): ")
     is_bad_format = True
     list_of_coordinates = coordinate.split(' ')
+    list_of_coordinates[0] = int(list_of_coordinates[0])
+    list_of_coordinates[1] = int(list_of_coordinates[1])
     while is_bad_format:
-        row = int(list_of_coordinates[0]) - 1
-        column = int(list_of_coordinates[1]) - 1
+        row = list_of_coordinates[0] - 1
+        column = list_of_coordinates[1] - 1
 
         if row < 0 or row > 14 or column < 0 or column > 14:
             print('invalid coordinates')
-            coordinate = input("Enter coordinates : ")
-            list_of_coordinates = coordinate.split(' ')
+            list_of_coordinates, direction = get_coords_input()
+
+        elif len(list_of_coordinates) < 2:
+            print('invalid coordinates')
+            is_bad_format = True
 
         elif new_jetons_board[row][column][0] == ' ':
             is_bad_format = False
         else:
             print("that place is already filled")
-            coordinate = input("Enter coordinates : ")
-            list_of_coordinates = coordinate.split(' ')
+            list_of_coordinates, direction = get_coords_input()
+    list_of_coordinates.append(direction)
     return list_of_coordinates
 
 
@@ -281,12 +325,16 @@ def tester_placement(jetons_board, row, column, direction, mot):
 
 
 def placer_mot(board, hand, mot, row, column, direction):
+    # maybe not, i think the sac has jokers
     """
         updates the hand and the board, removes the letters of the word from the hand; \n
         returns True; \n
         if not possible, nothing False \n
         row, column is position.
     """
+    print("mot: ", mot)
+    print("hand: ", hand)
+
     rowIndex = row - 1
     columnIndex = column - 1
     can_be_placed = tester_placement(
@@ -297,13 +345,19 @@ def placer_mot(board, hand, mot, row, column, direction):
             for i in range(len(mot)):
                 if board[rowIndex][columnIndex+i][0] != 'j':
                     board[rowIndex][columnIndex+i] = mot[i] + '  '
-                    hand.remove(mot[i])
+                    if mot[i] not in can_be_placed:
+                        hand.remove('?')
+                    else:
+                        hand.remove(mot[i])
 
         if direction == "vertical":
             for i in range(len(mot)):
                 if board[rowIndex+i][columnIndex][0] != 'j':
                     board[rowIndex+i][columnIndex] = mot[i] + '  '
-                    hand.remove(mot[i])
+                    if mot[i] not in can_be_placed:
+                        hand.remove('?')
+                    else:
+                        hand.remove(mot[i])
 
         return True
     else:
@@ -314,7 +368,8 @@ def valeur_mot_better(direction, mot, letters_value_dico, bonuses_dico, row, col
     """
         gets a bunch of arguments, and returns the value of the word\n
         adding all the bonuses of the table\n
-        row/column are positons
+        row/column are positons\n
+        returns value
     """
     multiplier = "1"
     rowIndex = row - 1
@@ -374,4 +429,7 @@ def valeur_mot_better(direction, mot, letters_value_dico, bonuses_dico, row, col
 
     print("total: ", word_value)
     word_value = word_value * int(multiplier)
+    if(len(mot) == 7):
+        word_value += 50
     print("total after the bonus: ", word_value)
+    return word_value
