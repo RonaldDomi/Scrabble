@@ -254,11 +254,22 @@ def get_coords_input():
         input row/column and input direction\n
         return [row, column], direction
     """
-    coordinate = input("Enter coordinates (row column): ")
-    list_of_coordinates = coordinate.split(' ')
-    list_of_coordinates[0] = int(list_of_coordinates[0])
-    list_of_coordinates[1] = int(list_of_coordinates[1])
+    invalid = True
+    while invalid:
+        try:
+            coordinate = input("Enter coordinates (row column): ")
+            list_of_coordinates = coordinate.split(' ')
+            list_of_coordinates[0] = int(list_of_coordinates[0])
+            list_of_coordinates[1] = int(list_of_coordinates[1])
+            invalid = False
+        except:
+            print("your input couldn't be parsed, try again")
+
     direction = input("Enter direction (horizontal, vertical): ")
+    while direction not in ["horizontal", "vertical"]:
+        print("invalid direction")
+        direction = input("Enter direction (horizontal, vertical): ")
+
     return list_of_coordinates, direction
 
 
@@ -267,29 +278,26 @@ def lire_coords(new_jetons_board):
         reads the coordinates in a predefined stucture  : row column direction\n
         returns the list of [row, column, direction]
     """
-    coordinate = input("Enter coordinates (row column): ")
-    direction = input("Enter direction (horizontal, vertical): ")
+    list_of_coordinates, direction = get_coords_input()
     is_bad_format = True
-    list_of_coordinates = coordinate.split(' ')
-    list_of_coordinates[0] = int(list_of_coordinates[0])
-    list_of_coordinates[1] = int(list_of_coordinates[1])
     while is_bad_format:
         row = list_of_coordinates[0] - 1
         column = list_of_coordinates[1] - 1
 
+        # invalid input test cases
+        # --input > than the board
         if row < 0 or row > 14 or column < 0 or column > 14:
             print('invalid coordinates')
-            list_of_coordinates, direction = get_coords_input()
-
-        elif len(list_of_coordinates) < 2:
-            print('invalid coordinates')
-            is_bad_format = True
-
-        elif new_jetons_board[row][column][0] == ' ':
-            is_bad_format = False
+        # --entering a deja completed cell
         else:
-            print("that place is already filled")
+            is_bad_format = False
+        # --not entering enough numbers
+        if len(list_of_coordinates) < 2:
+            print('please enter both numbers')
+            is_bad_format = True
+        if is_bad_format:
             list_of_coordinates, direction = get_coords_input()
+
     list_of_coordinates.append(direction)
     return list_of_coordinates
 
@@ -309,8 +317,13 @@ def tester_placement(jetons_board, row, column, direction, mot):
             return []
         i = 0
         for cellIndex in range(columnIndex, columnIndex + len(mot)):
-            if jetons_board[rowIndex][cellIndex][0] != 'j':
+            if jetons_board[rowIndex][cellIndex][0] == ' ':
                 list_of_letters.append(mot[i])
+            elif jetons_board[rowIndex][cellIndex][0] == mot[i]:
+                list_of_letters.append(mot[i])
+            else:
+                print('there is a word in your way')
+                return []
             i += 1
     elif direction == "vertical":
         if row + len(mot) > 14:
@@ -318,8 +331,13 @@ def tester_placement(jetons_board, row, column, direction, mot):
             return []
         i = 0
         for cellIndex in range(rowIndex, rowIndex + len(mot)):
-            if jetons_board[cellIndex][columnIndex][0] != 'j':
+            if jetons_board[cellIndex][columnIndex][0] == ' ':
                 list_of_letters.append(mot[i])
+            elif jetons_board[cellIndex][columnIndex][0] == mot[i]:
+                list_of_letters.append(mot[i])
+            else:
+                print('there is a word in your way')
+                return []
             i += 1
     return list_of_letters
 
@@ -345,7 +363,7 @@ def placer_mot(board, hand, mot, row, column, direction):
             for i in range(len(mot)):
                 if board[rowIndex][columnIndex+i][0] != 'j':
                     board[rowIndex][columnIndex+i] = mot[i] + '  '
-                    if mot[i] not in can_be_placed:
+                    if mot[i] not in hand:
                         hand.remove('?')
                     else:
                         hand.remove(mot[i])
@@ -354,7 +372,7 @@ def placer_mot(board, hand, mot, row, column, direction):
             for i in range(len(mot)):
                 if board[rowIndex+i][columnIndex][0] != 'j':
                     board[rowIndex+i][columnIndex] = mot[i] + '  '
-                    if mot[i] not in can_be_placed:
+                    if mot[i] not in hand:
                         hand.remove('?')
                     else:
                         hand.remove(mot[i])

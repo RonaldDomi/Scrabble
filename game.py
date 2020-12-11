@@ -6,7 +6,7 @@ def tour_joueur(player, board):
         desciption by Farah: shows us the board, gives the player choices to play\n
         if player acts, updates the board, and all that jizz\n
     """
-    print("old sac : ", sac)
+    # print("old sac : ", sac)
 
     hand = players_dico[player]['hand']
     print("hand: ", hand)
@@ -30,22 +30,33 @@ def tour_joueur(player, board):
         # get ready the words
         list_of_all_possible_words = generer_dico('documents/littre.txt')
         available_words = mots_jouables(list_of_all_possible_words, hand, 0)
+        if available_words == []:
+            print("You cannot make a word with the avalable letters")
+            tour_joueur(player, board)
+            return
         best_words = meilleurs_mots(available_words, hand, letters_dico)
         print('best option: ', best_words)
 
-        chosen_word = input("What word would you like to place? ")
+        correct_word = False
+        while correct_word != True:
+            chosen_word = input("What word would you like to place? ")
+            if chosen_word not in available_words:
+                print("Word does not exist, try to enter again")
+            else:
+                correct_word = True
 
-        # read the coordinates
-        coordinates_of_word = lire_coords(board)
+        is_placed = False
+        while is_placed != True:
+            # read the coordinates
+            coordinates_of_word = lire_coords(board)
 
-        row = coordinates_of_word[0]
-        column = coordinates_of_word[1]
-        direction = coordinates_of_word[2]
+            row = coordinates_of_word[0]
+            column = coordinates_of_word[1]
+            direction = coordinates_of_word[2]
 
-        # place the word
-        letters_that_need_to_be_put = tester_placement(
-            board, row, column, direction, chosen_word)
-        placer_mot(board, hand, chosen_word, row, column, direction)
+            # place the word
+            is_placed = placer_mot(
+                board, hand, chosen_word, row, column, direction)
 
         # update the player score
         played_word_value = valeur_mot_better(
@@ -96,45 +107,51 @@ bonus_board = init_bonus_board()
 
 
 #--------------------------- game loop ------------------#
-board_list = init_jeton()
-is_playing = True
-close_next_turn = False
-while is_playing:
-    print('\n\n\n\n')
-    if turn % 2 == 0:
-        print(player2, "'s turn: ")
-        tour_joueur(player2, board_list)
-        if close_next_turn:
-            is_playing = False
-    else:
-        print(player1, "'s turn: ")
-        tour_joueur(player1, board_list)
-        if close_next_turn:
-            is_playing = False
-    print_list(board_list)
+def play_game():
+    board_list = init_jeton()
+    is_playing = True
+    close_next_turn = False
+    while is_playing:
+        print('\n\n\n\n')
+        if turn % 2 == 0:
+            print(player2, "'s turn: ")
+            tour_joueur(player2, board_list)
+            if close_next_turn:
+                is_playing = False
+        else:
+            print(player1, "'s turn: ")
+            tour_joueur(player1, board_list)
+            if close_next_turn:
+                is_playing = False
+        print_list(board_list)
 
-    if(len(sac) == 0):
-        close_next_turn = True
+        if(len(sac) == 0):
+            close_next_turn = True
 
-    turn += 1
+        turn += 1
 
+
+# play_game()
 #--------------------------- game loop ------------------#
 
 
 #--------------------------- end game ------------------#
-print('\n\n\n')
-print('the game has ended')
-print(player1, "'s points before removing hand points are: ",
-      players_dico[player1]["score"])
-print(player2, "'s points before removing hand points are: ",
-      players_dico[player2]["score"])
-players_dico[player1]["score"] -= remove_hand_points(
-    players_dico[player1]['hand'], letters_dico)
-players_dico[player2]["score"] -= remove_hand_points(
-    players_dico[player2]['hand'], letters_dico)
-print(player1, "'s points after removing hand points are: ",
-      players_dico[player1]["score"])
-print(player2, "'s points after removing hand points are: ",
-      players_dico[player2]["score"])
+def show_end():
+    print('\n\n\n')
+    print('the game has ended')
+    print(player1, "'s points before removing hand points are: ",
+          players_dico[player1]["score"])
+    print(player2, "'s points before removing hand points are: ",
+          players_dico[player2]["score"])
+    players_dico[player1]["score"] -= remove_hand_points(
+        players_dico[player1]['hand'], letters_dico)
+    players_dico[player2]["score"] -= remove_hand_points(
+        players_dico[player2]['hand'], letters_dico)
+    print(player1, "'s points after removing hand points are: ",
+          players_dico[player1]["score"])
+    print(player2, "'s points after removing hand points are: ",
+          players_dico[player2]["score"])
 
+
+# show_end()
 #--------------------------- end game ------------------#
