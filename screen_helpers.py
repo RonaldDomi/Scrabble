@@ -6,11 +6,20 @@ import types
 
 cell_width = 50
 cell_color_fill = cell_width - 5
+
+
 red_color = [250, 0, 0]
 light_blue_color = [100, 100, 255]
 blue_color = [0, 0, 255]
 yellow_color = [255, 255, 0]
 green_color = [0, 255, 0]
+
+tyrian_purple = [92, 0, 41]
+oldMauve = [97, 48, 75]
+rythm = [133, 124, 141]
+opal = [148, 191, 190]
+caladon = [172, 247, 193]
+red_redd = [255, 34, 12]
 
 
 def draw_starting_board(screen, bonus_board):
@@ -24,19 +33,19 @@ def draw_starting_board(screen, bonus_board):
             color = None
             font = pygame.font.SysFont(None, 24)
             if bonus_board[rowIndex][cellIndex] == "MT":
-                color = red_color
+                color = tyrian_purple
                 cell_name = "MT"
             elif bonus_board[rowIndex][cellIndex] == "MD":
-                color = yellow_color
+                color = [182, 109, 13]
                 cell_name = "MD"
             elif bonus_board[rowIndex][cellIndex] == "LD":
-                color = light_blue_color
+                color = rythm
                 cell_name = "LD"
             elif bonus_board[rowIndex][cellIndex] == "LT":
-                color = blue_color
+                color = oldMauve
                 cell_name = "LT"
             else:
-                color = green_color
+                color = [106, 96, 92]
                 cell_name = ""
             cell = pygame.Rect(cell_width * cellIndex,
                                cell_width * rowIndex, cell_color_fill, cell_color_fill)
@@ -51,21 +60,27 @@ def draw_starting_board(screen, bonus_board):
 
 def update_board(screen, row, column, direction, mot):
     """
+        row/column are positions\n
         draws the cells, with their respective colors\n
         adds the name of the bonus above, if it has one \n
         and blits the cells
     """
     i = 0
+    row_index = row-1
+    column_index = column-1
     length = len(mot)
     list_of_cells_to_be_updated = []
+
     for times in range(length):
         if direction == 'horizontal':
-            list_of_cells_to_be_updated.append([row, column + times])
+            list_of_cells_to_be_updated.append(
+                [row_index, column_index + times])
         if direction == 'vertical':
-            list_of_cells_to_be_updated.append([row + times, column])
+            list_of_cells_to_be_updated.append(
+                [row_index + times, column_index])
 
-    for rowIndex in range(14):
-        for cellIndex in range(14):
+    for rowIndex in range(15):
+        for cellIndex in range(15):
             if [rowIndex, cellIndex] in list_of_cells_to_be_updated:
                 cell = pygame.Rect(cell_width * cellIndex,
                                    cell_width * rowIndex, cell_color_fill, cell_color_fill)
@@ -83,7 +98,7 @@ def draw_console(screen):
     """
         fills with black the current console
     """
-    dimentions = pygame.Rect(750, 250, 400, 450)
+    dimentions = pygame.Rect(750, 250, 400, 500)
     pygame.draw.rect(screen, [0, 0, 0], dimentions)
 
 
@@ -182,6 +197,10 @@ def player_console(screen, playerName, playerHand, playerScore, best_words):
               [255, 255, 255], "Corbel", 30)
     draw_bullet_points(screen, 920, 460, best_words)
 
+    draw_text(screen, 760, 560, "Player Score: ",
+              [255, 255, 255], "Corbel", 30)
+    draw_hand(screen, 920, 560, str(playerScore))
+
 
 def is_button_pressed(events, btn_x, btn_y, btn_width, btn_height):
     """
@@ -203,13 +222,14 @@ def get_cell_pressed(events):
         based on the position of the mouse
     """
     coords = pygame.mouse.get_pos()
-    if coords[0] < 700:
+    if coords[0] < 750:
         for event in events:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
-                    print('coords: ', coords[0], coords[1])
+                    # print('coords: ', coords[0], coords[1])
                     cellX_index = (coords[0]+1) // 50
                     cellY_index = (coords[1]+1) // 50
-                    print("returning: ", cellX_index, cellY_index)
+                    # print("returning indexes from click: (column, row) ",
+                    #       cellX_index, cellY_index)
                     return cellX_index, cellY_index
     return -1, -1

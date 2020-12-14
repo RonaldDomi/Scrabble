@@ -7,9 +7,9 @@ pygame.init()
 pygame.display.set_caption("Scrabble")
 os.environ['SDL_VIDEO_CENTERED'] = '1'
 width = 1100
-height = 700
+height = 750
 screen = pygame.display.set_mode((width, height))
-screen.fill((50, 50, 50))
+screen.fill((41, 77, 74))
 
 
 board_list = init_jeton()
@@ -39,8 +39,8 @@ players_dico = {}
 player1 = "Farah"
 # player2 = input("second player ")
 player2 = "Ronald"
-hand1 = piocher(10, sac)
-hand2 = piocher(10, sac)
+hand1 = piocher(7, sac)
+hand2 = piocher(7, sac)
 score1 = 0
 score2 = 0
 
@@ -66,6 +66,7 @@ def generate_console():
         available_words = mots_jouables(
             list_of_all_possible_words, players_dico[playerName]['hand'], 0)
         if available_words == []:
+            # pass
             print("You cannot make a word with the avalable letters")
             # do something
         best_words = meilleurs_mots(
@@ -87,93 +88,158 @@ def generate_console():
     return playerName, available_words
 
 
-generate_console()
+playerName = generate_console()[0]
 Playing = True
+last_turn = False
 userInput = ''
-playerName = ''
 is_console_generated = False
 waiting_cell = "None"
 while Playing:
     events = pygame.event.get()
     Playing = handle_exit(events)
+
+    # generate the console for the new player
     if is_console_generated == False:
-        print('console generated')
         draw_console(screen)
-        current_player_name, available_words = generate_console()
+        playerName, available_words = generate_console()
         is_console_generated = True
 
+    # get out of the main game loop
     if not Playing:
         break
 
     if waiting_cell[0:4] == "True":
         direction = waiting_cell[5:]
-        print(direction)
+
         cellX_index, cellY_index = get_cell_pressed(events)
         if cellX_index != -1 and cellY_index != -1:
             waiting_cell = "False"
         if waiting_cell == "False":
+            column = cellX_index+1
+            row = cellY_index+1
+
             if direction == 'Horizontal':
                 is_placed = placer_mot(
-                    board_list, players_dico[playerName]['hand'], userInput, cellY_index+1, cellX_index +
-                    1, 'horizontal')
-                update_board(screen, cellY_index, cellX_index,
-                             'horizontal', userInput)
+                    board_list, players_dico[playerName]['hand'], userInput, row, column, 'horizontal')
+
+                user_word_value = valeur_mot_better("horizontal", userInput,
+                                                    letters_dictionary, bonus_board, row, column)
+                players_dico[playerName]['score'] += user_word_value
+                if isinstance(is_placed, bool):
+
+                    update_board(screen, row, column,
+                                 'horizontal', userInput)
+                    is_console_generated = False
+                else:
+                    draw_console(screen)
+                    generate_console()
+                    turn -= 1
+                    draw_text(screen, 770, 600, is_placed, [
+                        255, 255, 255], 'Corbel', 30)
+
             else:
                 is_placed = placer_mot(
-                    board_list, players_dico[playerName]['hand'], userInput, cellY_index+1, cellX_index +
-                    1, 'vertical')
-                update_board(screen, cellY_index, cellX_index,
-                             'vertical', userInput)
-            print_list(board_list)
+                    board_list, players_dico[playerName]['hand'], userInput, row, column, 'vertical')
+                user_word_value = valeur_mot_better("vertical", userInput,
+                                                    letters_dictionary, bonus_board, row, column)
+                players_dico[playerName]['score'] += user_word_value
+                if isinstance(is_placed, bool):
+                    update_board(screen, row, column,
+                                 'vertical', userInput)
+                    is_console_generated = False
+                else:
+                    draw_console(screen)
+                    generate_console()
+                    turn -= 1
+                    draw_text(screen, 770, 600, is_placed, [
+                        255, 255, 255], 'Corbel', 30)
+            # print_list(board_list)
+            if(last_turn):
+                break
+            players_dico[playerName]['hand'] = completer_main(
+                players_dico[playerName]['hand'], sac)
 
             textinput.input_string = ''
-            is_console_generated = False
             turn += 1
 
     pygame.display.flip()
     # skip
     if is_button_pressed(events, button2_x, button2_y, button_width, button_height):
+        if(last_turn):
+            break
         turn += 1
         is_console_generated = False
         textinput.input_string = ''
     # exchange
     elif is_button_pressed(events, button3_x, button3_y, button_width, button_height):
-
-        is_console_generated = False
-
+        if(last_turn):
+            break
         textinput.input_string = ''
-        playerName, _ = generate_console()
         if userInput != '':
             selected_jetons = list(userInput)
-            updated_hand = echanger(
-                selected_jetons, players_dico[playerName]['hand'], sac)[0]
+            updated_hand, sac, did_exchange = echanger(
+                selected_jetons, players_dico[playerName]['hand'], sac)
             players_dico[playerName]['hand'] = updated_hand
-        turn += 1
+        if did_exchange:
+            is_console_generated = False
+            turn += 1
+
     # placement horizontal
     elif is_button_pressed(events, button4_x, button4_y, button_width, button_height):
-        # is_console_generated = False
-        playerName, available_words = generate_console()
         if userInput not in available_words:
-            print("Word does not exist, try to enter again")
-            turn -= 1
+            # print("Word does not exist, try to enter again")
+            draw_console(screen)
+            generate_console()
+            draw_text(screen, 800, 600, "Word does not exist", [
+                      255, 255, 255], 'Corbel', 30)
+            draw_text(screen, 800, 640, "Try to enter again", [
+                      255, 255, 255], 'Corbel', 30)
         else:
-            print("your word is correct")
-
-        waiting_cell = "True Horizontal"
-
+            # print("your word is correct")
+            waiting_cell = "True Horizontal"
+            is_console_generated = False
+            # draw_console(screen)
+            # generate_console()
+            draw_text(screen, 800, 600, "Place horizontal word", [
+                      255, 255, 255], 'Corbel', 30)
+            pygame.display.flip()
     # placement vertical
     elif is_button_pressed(events, button5_x, button5_y, button_width, button_height):
-        # is_console_generated = False
-        playerName, available_words = generate_console()
         if userInput not in available_words:
-            print("Word does not exist, try to enter again")
-            turn -= 1
+            # print("Word does not exist, try to enter again")
+            draw_console(screen)
+            generate_console()
+            draw_text(screen, 800, 600, "Word does not exist", [
+                      255, 255, 255], 'Corbel', 30)
+            draw_text(screen, 800, 640, "Try to enter again", [
+                      255, 255, 255], 'Corbel', 30)
         else:
-            print("your word is correct")
+            # print("your word is correct")
+            waiting_cell = "True Vertical"
+            is_console_generated = False
+            draw_text(screen, 800, 600, "Place vertical word", [
+                      255, 255, 255], 'Corbel', 30)
+            pygame.display.flip()
+            # draw_console(screen)
+            # generate_console()
+            # draw_text(screen, 800, 600, "Place vertical word", [
+            #           255, 255, 255], 'Corbel', 30)
 
-        waiting_cell = "True Vertical"
-    userInput = textinput.get_text()
+        print(sac)
+    userInput = textinput.get_text().upper()
     textinput.update(events)
 
     draw_buttons(screen, button_width, button_height, button_font)
     screen.blit(textinput.get_surface(), (920, 130))
+
+    if len(sac) == 0:
+        pl1_hand = players_dico[player1]['hand']
+        pl2_hand = players_dico[player2]['hand']
+        p1_damage = remove_hand_points(pl1_hand, letters_dictionary)
+        p2_damage = remove_hand_points(pl2_hand, letters_dictionary)
+        players_dico[player1]['score'] -= p1_damage
+        players_dico[player2]['score'] -= p2_damage
+        last_turn = True
+
+
+input("End game")
