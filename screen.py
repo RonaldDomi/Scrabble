@@ -9,7 +9,7 @@ os.environ['SDL_VIDEO_CENTERED'] = '1'
 width = 1100
 height = 750
 screen = pygame.display.set_mode((width, height))
-screen.fill((41, 77, 74))
+screen.fill((69, 72, 74))
 
 
 board_list = init_jeton()
@@ -19,7 +19,7 @@ draw_starting_board(screen, bonus_board)
 
 button_width = 130
 button_height = 40
-button_font = "Corbel"
+button_font = "Arial"
 buttons_cords = draw_buttons(screen, button_width, button_height, button_font)
 button2_x, button2_y = buttons_cords[0][0], buttons_cords[0][1]
 button3_x, button3_y = buttons_cords[1][0], buttons_cords[1][1]
@@ -31,13 +31,11 @@ pygame.display.flip()
 
 # player variable
 letters_dictionary = letters_dico()
-list_of_all_possible_words = generer_dico('documents/littre.txt')
+list_of_all_possible_words = generer_dico('littre.txt')
 sac = init_sac(letters_dictionary)
 
 players_dico = {}
-# player1 = input("first player ")
 player1 = "Farah"
-# player2 = input("second player ")
 player2 = "Ronald"
 hand1 = piocher(7, sac)
 hand2 = piocher(7, sac)
@@ -58,6 +56,7 @@ textinput = TextInput(text_color=(255, 255, 255), cursor_color=(255, 255, 255))
 def generate_console():
     """
         returns the current_turn playerName, and available words of the current_player\n
+        doesn't flip the screen
     """
     playerName = ''
     available_words = []
@@ -65,10 +64,6 @@ def generate_console():
         playerName = player1
         available_words = mots_jouables(
             list_of_all_possible_words, players_dico[playerName]['hand'], 0)
-        if available_words == []:
-            # pass
-            print("You cannot make a word with the avalable letters")
-            # do something
         best_words = meilleurs_mots(
             available_words, players_dico[playerName]['hand'], letters_dictionary)
         player_console(
@@ -78,9 +73,6 @@ def generate_console():
         playerName = player2
         available_words = mots_jouables(
             list_of_all_possible_words, players_dico[playerName]['hand'], 0)
-        if available_words == []:
-            print("You cannot make a word with the avalable letters")
-            # do something
         best_words = meilleurs_mots(
             available_words, players_dico[playerName]['hand'], letters_dictionary)
         player_console(
@@ -110,6 +102,9 @@ while Playing:
 
     if waiting_cell[0:4] == "True":
         direction = waiting_cell[5:]
+        # all_possible_words =
+        available_words = mots_jouables(
+            list_of_all_possible_words, players_dico[playerName]['hand'], 0)
 
         cellX_index, cellY_index = get_cell_pressed(events)
         if cellX_index != -1 and cellY_index != -1:
@@ -119,41 +114,40 @@ while Playing:
             row = cellY_index+1
 
             if direction == 'Horizontal':
-                is_placed = placer_mot(
+                is_placed = placer_mot_screen(
                     board_list, players_dico[playerName]['hand'], userInput, row, column, 'horizontal')
 
-                user_word_value = valeur_mot_better("horizontal", userInput,
-                                                    letters_dictionary, bonus_board, row, column)
-                players_dico[playerName]['score'] += user_word_value
                 if isinstance(is_placed, bool):
 
                     update_board(screen, row, column,
                                  'horizontal', userInput)
                     is_console_generated = False
+                    user_word_value = valeur_mot_better("horizontal", userInput,
+                                                        letters_dictionary, bonus_board, row, column)
+                    players_dico[playerName]['score'] += user_word_value
                 else:
                     draw_console(screen)
                     generate_console()
                     turn -= 1
                     draw_text(screen, 770, 600, is_placed, [
-                        255, 255, 255], 'Corbel', 30)
+                        255, 255, 255], 'Arial', 30)
 
             else:
-                is_placed = placer_mot(
+                is_placed = placer_mot_screen(
                     board_list, players_dico[playerName]['hand'], userInput, row, column, 'vertical')
-                user_word_value = valeur_mot_better("vertical", userInput,
-                                                    letters_dictionary, bonus_board, row, column)
-                players_dico[playerName]['score'] += user_word_value
                 if isinstance(is_placed, bool):
                     update_board(screen, row, column,
                                  'vertical', userInput)
                     is_console_generated = False
+                    user_word_value = valeur_mot_better("vertical", userInput,
+                                                        letters_dictionary, bonus_board, row, column)
+                    players_dico[playerName]['score'] += user_word_value
                 else:
                     draw_console(screen)
                     generate_console()
                     turn -= 1
                     draw_text(screen, 770, 600, is_placed, [
-                        255, 255, 255], 'Corbel', 30)
-            # print_list(board_list)
+                        255, 255, 255], 'Arial', 30)
             if(last_turn):
                 break
             players_dico[playerName]['hand'] = completer_main(
@@ -183,49 +177,43 @@ while Playing:
         if did_exchange:
             is_console_generated = False
             turn += 1
+        else:
+            draw_console(screen)
+            generate_console()
+            draw_text(screen, 800, 600, "Can't exchange hand", [
+                      255, 255, 255], 'Arial', 30)
 
     # placement horizontal
     elif is_button_pressed(events, button4_x, button4_y, button_width, button_height):
         if userInput not in available_words:
-            # print("Word does not exist, try to enter again")
             draw_console(screen)
             generate_console()
             draw_text(screen, 800, 600, "Word does not exist", [
-                      255, 255, 255], 'Corbel', 30)
+                      255, 255, 255], 'Arial', 30)
             draw_text(screen, 800, 640, "Try to enter again", [
-                      255, 255, 255], 'Corbel', 30)
+                      255, 255, 255], 'Arial', 30)
         else:
-            # print("your word is correct")
             waiting_cell = "True Horizontal"
             is_console_generated = False
-            # draw_console(screen)
-            # generate_console()
             draw_text(screen, 800, 600, "Place horizontal word", [
-                      255, 255, 255], 'Corbel', 30)
+                      255, 255, 255], 'Arial', 30)
             pygame.display.flip()
     # placement vertical
     elif is_button_pressed(events, button5_x, button5_y, button_width, button_height):
         if userInput not in available_words:
-            # print("Word does not exist, try to enter again")
             draw_console(screen)
             generate_console()
             draw_text(screen, 800, 600, "Word does not exist", [
-                      255, 255, 255], 'Corbel', 30)
+                      255, 255, 255], 'Arial', 30)
             draw_text(screen, 800, 640, "Try to enter again", [
-                      255, 255, 255], 'Corbel', 30)
+                      255, 255, 255], 'Arial', 30)
         else:
-            # print("your word is correct")
             waiting_cell = "True Vertical"
             is_console_generated = False
             draw_text(screen, 800, 600, "Place vertical word", [
-                      255, 255, 255], 'Corbel', 30)
+                      255, 255, 255], 'Arial', 30)
             pygame.display.flip()
-            # draw_console(screen)
-            # generate_console()
-            # draw_text(screen, 800, 600, "Place vertical word", [
-            #           255, 255, 255], 'Corbel', 30)
 
-        print(sac)
     userInput = textinput.get_text().upper()
     textinput.update(events)
 
@@ -242,4 +230,19 @@ while Playing:
         last_turn = True
 
 
-input("End game")
+pygame.draw.rect(screen, [0, 0, 0], [750, 0, 350, 750])
+draw_text(screen, 760, 360, f"{player1} Score: ",
+          [255, 255, 255], "Arial", 30)
+draw_hand(screen, 920, 360, str(players_dico[player1]['score']))
+draw_text(screen, 760, 560, f"{player2} Score: ",
+          [255, 255, 255], "Arial", 30)
+draw_hand(screen, 920, 560, str(players_dico[player2]['score']))
+pygame.display.flip()
+ending = True
+while ending:  # untill the game is closed
+    for event in pygame.event.get():
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                ending = False
+        elif event.type == pygame.QUIT:
+            ending = False

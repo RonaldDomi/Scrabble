@@ -8,20 +8,6 @@ cell_width = 50
 cell_color_fill = cell_width - 5
 
 
-red_color = [250, 0, 0]
-light_blue_color = [100, 100, 255]
-blue_color = [0, 0, 255]
-yellow_color = [255, 255, 0]
-green_color = [0, 255, 0]
-
-tyrian_purple = [92, 0, 41]
-oldMauve = [97, 48, 75]
-rythm = [133, 124, 141]
-opal = [148, 191, 190]
-caladon = [172, 247, 193]
-red_redd = [255, 34, 12]
-
-
 def draw_starting_board(screen, bonus_board):
     """
         draws the cells, with their respective colors\n
@@ -32,20 +18,20 @@ def draw_starting_board(screen, bonus_board):
         for cellIndex in range(len(bonus_board[0])):
             color = None
             font = pygame.font.SysFont(None, 24)
-            if bonus_board[rowIndex][cellIndex] == "MT":
-                color = tyrian_purple
+            if bonus_board[rowIndex][cellIndex] == "MT ":
+                color = [61, 119, 123]
                 cell_name = "MT"
-            elif bonus_board[rowIndex][cellIndex] == "MD":
-                color = [182, 109, 13]
+            elif bonus_board[rowIndex][cellIndex] == "MD ":
+                color = [91, 167, 174]
                 cell_name = "MD"
-            elif bonus_board[rowIndex][cellIndex] == "LD":
-                color = rythm
+            elif bonus_board[rowIndex][cellIndex] == "LD ":
+                color = [118, 183, 188]
                 cell_name = "LD"
-            elif bonus_board[rowIndex][cellIndex] == "LT":
-                color = oldMauve
+            elif bonus_board[rowIndex][cellIndex] == "LT ":
+                color = [159, 205, 208]
                 cell_name = "LT"
             else:
-                color = [106, 96, 92]
+                color = [108, 112, 117]
                 cell_name = ""
             cell = pygame.Rect(cell_width * cellIndex,
                                cell_width * rowIndex, cell_color_fill, cell_color_fill)
@@ -103,6 +89,9 @@ def draw_console(screen):
 
 
 def draw_text(screen,  x, y, text, color, text_font, text_size):
+    """
+        get many arguments and blits the text to screen at the position wanted
+    """
     font = pygame.font.SysFont(text_font, text_size)
     text = font.render(text, True, color)
     screen.blit(text, (x, y))
@@ -111,7 +100,7 @@ def draw_text(screen,  x, y, text, color, text_font, text_size):
 def show_button(screen, x, y, button_width, button_height,  button_color, text_font, text, text_size, text_color):
     """
         just complete the arguments, it makes sense\n
-        also blits the text
+        also blits the text to screen
     """
     font = pygame.font.SysFont(text_font, text_size)
     text = font.render(text, True, text_color)
@@ -122,7 +111,7 @@ def show_button(screen, x, y, button_width, button_height,  button_color, text_f
 def handle_exit(events):
     """
         key_input handler\n
-        return True or False\n
+        return True or False if we wanted to quit\n
     """
     Playing = True
     for event in events:
@@ -135,48 +124,61 @@ def handle_exit(events):
 
 
 def draw_hand(screen, x, y, hand):
+    """
+        draws the hand of the player to the screen\n
+        doesn't blit \n
+    """
     translate = 20
     for letterIndex in range(len(hand)):
         draw_text(screen, x + translate*letterIndex, y,
-                  hand[letterIndex], [255, 0, 0], 'Corbel', 30)
+                  hand[letterIndex], [173, 212, 215], 'Arial', 30)
 
 
 def draw_bullet_points(screen, x, y, theList):
+    """
+        bullet point drawing of the words to the screen\n
+        doesn't blit the screen
+    """
     translate = 30
     for itemIndex in range(len(theList)):
         draw_text(screen, x, y + translate*itemIndex,
-                  theList[itemIndex], [255, 0, 0], 'Corbel', 30)
+                  theList[itemIndex], [173, 212, 215], 'Arial', 30)
 
 
 def draw_buttons(screen, button_width, button_height, button_font):
-    pygame.draw.rect(screen, [50, 50, 50], [750, 0, 350, 250])
+    """
+        draws all the buttons at once\n
+        returs the [[button1_x, button2_y], ...] for all the buttons we have created
+    """
+    pygame.draw.rect(screen, [0, 0, 0], [750, 0, 350, 250])
+    button_color = [61, 119, 123]
     # ----------- BUTTON 2
     button2_x = 780
     button2_y = 20
     text_color = [0, 0, 0]
     show_button(screen, button2_x, button2_y, button_width,
-                button_height, [100, 100, 100], button_font, 'Skip', 18, text_color)
+                button_height, button_color, button_font, 'Skip', 18, text_color)
 
     # ----------- BUTTON 3
     button3_x = 780
     button3_y = 90
     text_color = [0, 0, 0]
     show_button(screen, button3_x, button3_y, button_width,
-                button_height, [100, 100, 100], button_font, 'Exchange', 18, text_color)
+                button_height, button_color, button_font, 'Exchange', 18, text_color)
 
     # ----------- BUTTON 4
     button4_x = 780
     button4_y = 150
     text_color = [0, 0, 0]
     show_button(screen, button4_x, button4_y, button_width,
-                button_height, [100, 100, 100], button_font, 'Place horizontal', 18, text_color)
+                button_height, button_color, button_font, 'Place horizontal', 18, text_color)
 
     # ----------- BUTTON 5
     button5_x = 780
     button5_y = 200
     text_color = [0, 0, 0]
     show_button(screen, button5_x, button5_y, button_width,
-                button_height, [100, 100, 100], button_font, 'Place vertical', 18, text_color)
+                button_height, button_color, button_font, 'Place vertical', 18, text_color)
 
     return [[button2_x, button2_y], [button3_x, button3_y], [button4_x, button4_y], [button5_x, button5_y]]
 
@@ -187,18 +189,21 @@ def player_console(screen, playerName, playerHand, playerScore, best_words):
     """
 
     # name
-    draw_text(screen, 760, 260, "Player Name: ", [255, 255, 255], "Corbel", 30)
-    draw_text(screen, 950, 260, playerName, [255, 0, 0], "Corbel", 30)
+    draw_text(screen, 760, 260, "Player Name: ", [
+              255, 255, 255], "Arial", 30)
+    draw_text(screen, 950, 260, playerName, [
+              173, 212, 215], "Arial", 30)
     # hand
-    draw_text(screen, 760, 360, "Player Hand: ", [255, 255, 255], "Corbel", 30)
+    draw_text(screen, 760, 360, "Player Hand: ", [255, 255, 255], "Arial", 30)
     draw_hand(screen, 920, 360, playerHand)
-
+    # word list
     draw_text(screen, 760, 460, "Best Option: ",
-              [255, 255, 255], "Corbel", 30)
+              [255, 255, 255], "Arial", 30)
     draw_bullet_points(screen, 920, 460, best_words)
 
+    # score
     draw_text(screen, 760, 560, "Player Score: ",
-              [255, 255, 255], "Corbel", 30)
+              [255, 255, 255], "Arial", 30)
     draw_hand(screen, 920, 560, str(playerScore))
 
 
@@ -226,10 +231,7 @@ def get_cell_pressed(events):
         for event in events:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
-                    # print('coords: ', coords[0], coords[1])
                     cellX_index = (coords[0]+1) // 50
                     cellY_index = (coords[1]+1) // 50
-                    # print("returning indexes from click: (column, row) ",
-                    #       cellX_index, cellY_index)
                     return cellX_index, cellY_index
     return -1, -1

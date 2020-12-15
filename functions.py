@@ -26,15 +26,15 @@ def init_bonus_board():
     for rowIndex in range(15):  # [ []  [] ]
         for cellIndex in range(15):
             if board[rowIndex][cellIndex] in cases_MT:
-                board[rowIndex][cellIndex] = "MT"
+                board[rowIndex][cellIndex] = "MT "
             elif board[rowIndex][cellIndex] in cases_MD:
-                board[rowIndex][cellIndex] = "MD"
+                board[rowIndex][cellIndex] = "MD "
             elif board[rowIndex][cellIndex] in cases_LT:
-                board[rowIndex][cellIndex] = "LT"
+                board[rowIndex][cellIndex] = "LT "
             elif board[rowIndex][cellIndex] in cases_LD:
-                board[rowIndex][cellIndex] = "LD"
+                board[rowIndex][cellIndex] = "LD "
             else:
-                board[rowIndex][cellIndex] = "  "
+                board[rowIndex][cellIndex] = "   "
     return board
 
 
@@ -52,7 +52,11 @@ def init_jeton():
 
 
 def affiche_jetons(empty_jetons, list_jetons):
-
+    """
+        this function is never used\n
+        its was supposed to show the bonus if we had a jeton in it\n
+        following the guide of the project
+    """
     new_jetons_board = copy.deepcopy(empty_jetons)
     for row_index in range(15):
         for cell_index in range(15):
@@ -74,6 +78,9 @@ def affiche_jetons(empty_jetons, list_jetons):
 
 
 def print_list(board_list):
+    """
+        easy way to correctly print the boards
+    """
     for row in board_list:
         print(row)
         print()
@@ -83,7 +90,7 @@ def print_list(board_list):
 
 def letters_dico():
     """
-        dictionary with the values of each letter of the alphabet
+        returns dictionary with the values of each letter of the alphabet
     """
     values_list = [1, 3, 3, 2, 1, 4, 2, 4, 1, 8, 10, 1,
                    2, 1, 1, 3, 8, 1, 1, 1, 1, 4, 10, 10, 10, 10]
@@ -175,6 +182,10 @@ def generer_dico(file):
 
 
 def mot_jouable(our_word, list_of_available_letters):
+    """
+        returns True/False if the word can \n
+        be formed with the letters of the hand
+    """
     jouable = True
     letters_copy = copy.copy(list_of_available_letters)
     for letter in our_word:
@@ -189,7 +200,10 @@ def mot_jouable(our_word, list_of_available_letters):
     return jouable
 
 
-def mots_jouables(words_list, list_of_available_letters, extras):  # extras is a number
+def mots_jouables(words_list, list_of_available_letters, extras):
+    """
+        returns the list of all words, formed with hand letters
+    """
     list_of_available_letters_copy = copy.copy(list_of_available_letters)
     list_of_available_letters_copy += ['?'] * extras
 
@@ -202,9 +216,15 @@ def mots_jouables(words_list, list_of_available_letters, extras):  # extras is a
 
 
 def valeur_mot(mot, dico):
+    """
+    returns the value of the word according to the scrabble rules
+    """
     total = 0
     for letter in mot:
-        total = total + dico[letter.upper()]['val']
+        try:
+            total = total + dico[letter.upper()]['val']
+        except:
+            total = total + 1
     if len(mot) == 7:
         total += 50
 
@@ -310,7 +330,7 @@ def lire_coords(new_jetons_board):
 def tester_placement(jetons_board, row, column, direction, mot):
     '''
         returns the list of letters for the word; \n
-        else returns [] \n
+        else returns [..] or error code \n
         row, column is position.
     '''
     list_of_letters = []
@@ -329,12 +349,12 @@ def tester_placement(jetons_board, row, column, direction, mot):
             elif jetons_board[rowIndex][cellIndex][0] == mot[i]:
                 list_of_letters.append(mot[i])
             else:
-                # print('there is a word in your way')
+                print('there is a word in your way')
                 return "There is a word in your way"
             i += 1
     elif direction == "vertical":
         if rowIndex + len(mot) - 1 > 14:
-            # print('outside boundaries')
+            print('outside boundaries')
             return "Outside boundaries"
         i = 0
         for cellIndex in range(rowIndex, rowIndex + len(mot)):
@@ -343,14 +363,98 @@ def tester_placement(jetons_board, row, column, direction, mot):
             elif jetons_board[cellIndex][columnIndex][0] == mot[i]:
                 list_of_letters.append(mot[i])
             else:
-                # print('there is a word in your way')
+                print('there is a word in your way')
                 return "There is a word in your way"
             i += 1
     return list_of_letters
 
 
-def placer_mot(board, hand, mot, row, column, direction):
-    # maybe not, i think the sac has jokers
+def tester_placement_console(bonus_board, row, column, direction, mot):
+    '''
+        returns the list of letters for the word; \n
+        else returns [..] or error code \n
+        row, column is position.
+    '''
+    list_of_letters = []
+    rowIndex = row - 1
+    columnIndex = column - 1
+    # print('testing placement index: (row, column)', rowIndex, columnIndex)
+    # print('len of word inputed: ', len(mot))
+    if direction == "horizontal":
+        if columnIndex + len(mot) - 1 > 14:
+            print('outside boundaries')
+            return "Outside boundaries"
+        i = 0
+        for cellIndex in range(columnIndex, columnIndex + len(mot)):
+            # print("testing: ", bonus_board[rowIndex][cellIndex])
+            if bonus_board[rowIndex][cellIndex] in ['   ', 'MT ', 'MD ', 'LT ', 'LD ']:
+                list_of_letters.append(mot[i])
+            elif bonus_board[rowIndex][cellIndex][0] == mot[i]:
+                list_of_letters.append(mot[i])
+            else:
+                print('there is a word in your way')
+                return "There is a word in your way"
+            i += 1
+    elif direction == "vertical":
+        if rowIndex + len(mot) - 1 > 14:
+            print('outside boundaries')
+            return "Outside boundaries"
+        i = 0
+        for cellIndex in range(rowIndex, rowIndex + len(mot)):
+            if bonus_board[cellIndex][columnIndex] in ['   ', 'MT ', 'MD ', 'LT ', 'LD ']:
+                list_of_letters.append(mot[i])
+            elif bonus_board[cellIndex][columnIndex][0] == mot[i]:
+                list_of_letters.append(mot[i])
+            else:
+                print('there is a word in your way')
+                return "There is a word in your way"
+            i += 1
+    return list_of_letters
+
+
+def placer_mot(board, bonus_board, hand, mot, row, column, direction):
+    """
+        row/column arguments are positions\n
+        updates the hand and the board, removes the letters of the word from the hand; \n
+        returns True; \n
+        if not possible, return the error string \n
+        row, column is position.
+    """
+    # print("mot: ", mot)
+    # print("hand: ", hand)
+
+    rowIndex = row - 1
+    columnIndex = column - 1
+    can_be_placed = tester_placement_console(
+        bonus_board, row, column, direction, mot)
+    if isinstance(can_be_placed, list):
+        # print('word can be placed')
+        if direction == "horizontal":
+            for i in range(len(mot)):
+                if board[rowIndex][columnIndex+i][0] != 'j':
+                    # board[rowIndex][columnIndex+i] = mot[i] + '  '
+                    bonus_board[rowIndex][columnIndex+i] = mot[i] + '  '
+                    if mot[i] not in hand:
+                        hand.remove('?')
+                    else:
+                        hand.remove(mot[i])
+
+        if direction == "vertical":
+            for i in range(len(mot)):
+                if board[rowIndex+i][columnIndex][0] != 'j':
+                    bonus_board[rowIndex+i][columnIndex] = mot[i] + '  '
+                    if mot[i] not in hand:
+                        hand.remove('?')
+                    else:
+                        hand.remove(mot[i])
+
+        return True
+    else:
+        # print('word shouldnt be placed')
+        return can_be_placed
+
+
+def placer_mot_screen(board, hand, mot, row, column, direction):
     """
         row/column arguments are positions\n
         updates the hand and the board, removes the letters of the word from the hand; \n
@@ -372,6 +476,7 @@ def placer_mot(board, hand, mot, row, column, direction):
             for i in range(len(mot)):
                 if board[rowIndex][columnIndex+i][0] != 'j':
                     board[rowIndex][columnIndex+i] = mot[i] + '  '
+                    # bonus_board[rowIndex][columnIndex+i] = mot[i] + '  '
                     if mot[i] not in hand:
                         hand.remove('?')
                     else:
@@ -380,7 +485,8 @@ def placer_mot(board, hand, mot, row, column, direction):
         if direction == "vertical":
             for i in range(len(mot)):
                 if board[rowIndex+i][columnIndex][0] != 'j':
-                    board[rowIndex+i][columnIndex] = mot[i] + '  '
+                    board[rowIndex][columnIndex+i] = mot[i] + '  '
+                    # bonus_board[rowIndex+i][columnIndex] = mot[i] + '  '
                     if mot[i] not in hand:
                         hand.remove('?')
                     else:
@@ -394,7 +500,7 @@ def placer_mot(board, hand, mot, row, column, direction):
 
 def valeur_mot_better(direction, mot, letters_value_dico, bonuses_dico, row, column):
     """
-        gets a bunch of arguments, and returns the value of the word\n
+        gets a BUNCH of arguments, and returns the value of the word\n
         adding all the bonuses of the table\n
         row/column are positons\n
         returns value
@@ -464,6 +570,10 @@ def valeur_mot_better(direction, mot, letters_value_dico, bonuses_dico, row, col
 
 
 def remove_hand_points(hand, letters_points_dic):
+    """
+        return the points of the hand, if the player still has letters \n
+        in hand after the game ends
+    """
     points_to_be_removed = 0
     for hand_letter in hand:
         points_to_be_removed += letters_points_dic[hand_letter.upper()]['val']
