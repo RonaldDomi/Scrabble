@@ -31,7 +31,7 @@ pygame.display.flip()
 
 # player variable
 letters_dictionary = letters_dico()
-list_of_all_possible_words = generer_dico('littre.txt')
+list_of_all_possible_words = generer_dico('data/littre.txt')
 sac = init_sac(letters_dictionary)
 
 players_dico = {}

@@ -30,7 +30,7 @@ def tour_joueur(player, board):
         # place word
 
         # get ready the words
-        list_of_all_possible_words = generer_dico('littre.txt')
+        list_of_all_possible_words = generer_dico('data/littre.txt')
         available_words = mots_jouables(list_of_all_possible_words, hand, 0)
         if available_words == []:
             print("You cannot make a word with the avalable letters")
